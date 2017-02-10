@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo -e "\e[30;48;5;82m DEVELOPMENT: STOPPING & REMOVING ALL CONTAINERS \e[0m"
+
+docker-compose stop
+docker-compose rm -fv

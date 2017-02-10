@@ -1,0 +1,43 @@
+code:
+    extends:
+        file: docker-services.yml
+        service: code_base
+    volumes:
+        - "./project:/var/www"
+
+fpm:
+    extends:
+        file: docker-services.yml
+        service: fpm_base
+    volumes_from:
+        - code
+    links:
+        - mysql
+    restart: always
+
+cli:
+    extends:
+        file: docker-services.yml
+        service: cli_base
+    volumes_from:
+        - code
+    volumes:
+        - "./.composer:/root/.composer"
+    links:
+        - mysql
+
+nginx:
+    extends:
+        file: docker-services.yml
+        service: nginx_base
+    volumes_from:
+        - code
+    links:
+        - fpm
+    restart: always
+
+mysql:
+    extends:
+        file: docker-services.yml
+        service: mysql_base
+    restart: always

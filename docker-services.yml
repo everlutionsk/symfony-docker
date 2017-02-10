@@ -1,0 +1,41 @@
+mysql_base:
+    build: docker/images/mysql
+    ports:
+        - "0.0.0.0:3306:3306"
+    tty: true
+    hostname: mysql-host
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+    volumes:
+        - "./volumes/mysqldata/:/var/lib/mysql"
+
+code_base:
+    build: docker/images/code
+    hostname: code-host
+
+fpm_base:
+    build: docker/images/fpm
+    hostname: fpm-host
+    working_dir: /var/www
+
+cli_base:
+    build: docker/images/cli
+    tty: true
+    hostname: cli-host
+    working_dir: /var/www
+    environment:
+        COMPOSER_ALLOW_SUPERUSER: 1
+
+nginx_base:
+    build: docker/images/nginx
+    tty: true
+    hostname: nginx-host
+    environment:
+        PHPFPM_HOST: fpm-host
+        PHPFPM_PORT: 9000
+        SYMFONY_SERVERNAME: dev.symfony
+        SYMFONY_ROOT: /var/www/web
+    ports:
+        - "8080:80"
+    volumes:
+        - "./volumes/nginx/:/var/log/nginx"
