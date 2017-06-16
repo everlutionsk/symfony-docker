@@ -21,4 +21,9 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
 RUN docker-php-ext-install mcrypt pdo_mysql mysqli intl mbstring exif gd opcache pcntl
 
+# Configure xdebug
+RUN pecl install xdebug
+RUN docker-php-ext-enable xdebug
+COPY ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
 CMD ["php-fpm"]

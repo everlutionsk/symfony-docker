@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+echo -e "\e[41m STOP AND REMOVE CONTAINERS \e[0m"
+
+./compose stop
+./compose rm
