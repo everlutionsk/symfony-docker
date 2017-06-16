@@ -1,22 +1,20 @@
-FROM ubuntu:xenial
+FROM nginx:1.13.0
 
-RUN apt-get update && apt-get install -y \
-    nginx
+ARG ENV=dev
+ARG DOMAIN=dev.symfony
 
-ADD nginx.conf /etc/nginx/
+ENV DOMAIN $DOMAIN
 
-ADD symfony.conf /etc/nginx/sites-available/
+# Remove default nginx site configuration.
+RUN rm -rf /etc/nginx/conf.d/default.conf
 
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# Add nginx proxy configuration.
+COPY $ENV.conf /etc/nginx/conf.d/proxy.conf
 
-RUN ln -s /etc/nginx/sites-available/symfony.conf /etc/nginx/sites-enabled/symfony
+RUN sed -i "s/{domain}/$DOMAIN/g" /etc/nginx/conf.d/proxy.conf
+CMD cat /etc/nginx/conf.d/proxy.conf
 
-RUN rm /etc/nginx/sites-enabled/default
+# Run nginx in foreground.
+CMD ["nginx", "-g", "daemon off;"]
 
-RUN usermod -u 1000 www-data
 
-CMD ["nginx"]
-
-EXPOSE 80
-EXPOSE 443

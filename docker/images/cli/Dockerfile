@@ -1,4 +1,4 @@
-FROM php:cli
+FROM php:7.1.5-cli
 
 COPY app.ini /usr/local/etc/php/conf.d/app.ini
 
@@ -11,24 +11,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxtst6 \
     libicu-dev \
     libcurl4-openssl-dev \
-    zlib1g-dev \
     curl \
     git \
-    && docker-php-ext-install mcrypt \
-    && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
-    && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install intl \
-    && docker-php-ext-install mbstring \
-    && docker-php-ext-install exif \
-    && docker-php-ext-configure gd --enable-gd-native-ttf --with-jpeg-dir=/usr/lib/x86_64-linux-gnu --with-png-dir=/usr/lib/x86_64-linux-gnu --with-freetype-dir=/usr/lib/x86_64-linux-gnu \
-    && docker-php-ext-install gd \
-    && docker-php-ext-install opcache \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install pcntl
+    zlib1g-dev \
+    curl \
+    npm \
+    libpcre3-dev
+ 
+RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
+RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
+RUN docker-php-ext-configure gd --enable-gd-native-ttf --with-jpeg-dir=/usr/lib/x86_64-linux-gnu --with-png-dir=/usr/lib/x86_64-linux-gnu --with-freetype-dir=/usr/lib/x86_64-linux-gnu
+RUN docker-php-ext-install mcrypt pdo_mysql mysqli intl mbstring gd zip
 
-# install composer
+# Add bower
+RUN npm install -g bower
+RUN ln -s /usr/bin/nodejs /usr/bin/node
+RUN echo "alias bower='bower --allow-root'" >> ~/.bashrc
+
+# Add composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-RUN usermod -u 1000 www-data
