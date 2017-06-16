@@ -1,0 +1,15 @@
+version: '2'
+services:
+  db:
+    build: docker/images/mysql
+    ports:
+      - "0.0.0.0:${DB_PORT}:3306"
+    tty: true
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - "./volumes/mysql/:/var/lib/mysql"
+    restart: unless-stopped
+
+  fpm:
+    build: docker/images/fpm-dev

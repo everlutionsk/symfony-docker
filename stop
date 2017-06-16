@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-echo -e "\e[41m STOPING \e[0m"
-docker-compose stop
+echo -e "\e[41m STOP CONTAINERS \e[0m"
+
+./compose stop

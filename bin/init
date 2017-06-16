@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root (sudo)"
+    exit
+fi
+
+if [ "${SUDO_USER}" == "root" ]; then
+    echo "You need to run as sudo with regular user; not sudo su"
+    exit
+fi
+
+if [ $# -eq 0 ]; then
+    echo "Please provide domain name as the only argument"
+    exit
+fi
+
+DOMAIN=$1
+
+if ! grep -q $DOMAIN /etc/hosts; then
+    echo -e "\e[30;48;5;82m APPENDING /etc/hosts \e[0m"
+    echo "127.0.0.1 $DOMAIN" >> /etc/hosts
+fi
+
+echo -e "\e[30;48;5;82m STARTING DOCKER CONTAINERS \e[0m"
+sudo -u ${SUDO_USER} ./up
+
+# uncomment if applicable
+# echo -e "\e[30;48;5;82m INSTALLING BOWER \e[0m"
+# sudo -u ${SUDO_USER} ./compose run --rm cli bower install --allow-root
+
+echo -e "\e[30;48;5;82m INSTALLING COMPOSER \e[0m"
+sudo -u ${SUDO_USER} cp project/app/config/parameters.yml.dist project/app/config/parameters.yml
+sudo -u ${SUDO_USER} ./compose run --rm cli composer install
+
+echo -e "\e[30;48;5;82m INITIALIZE DATABASE \e[0m"
+sudo -u ${SUDO_USER} ./compose run --rm cli bin/console d:d:c --if-not-exists
+sudo -u ${SUDO_USER} ./compose run --rm cli bin/console d:s:u --force
+
+./bin/fix-permissions

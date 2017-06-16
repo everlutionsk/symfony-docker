@@ -1,43 +1,46 @@
-code:
-    extends:
-        file: docker-services.yml
-        service: code_base
+version: '2'
+services:
+  code:
+    build: docker/images/code
     volumes:
-        - "./project:/var/www"
+      - "./project:/var/www"
 
-fpm:
-    extends:
-        file: docker-services.yml
-        service: fpm_base
+  fpm:
+    build: docker/images/fpm
+    working_dir: /var/www
     volumes_from:
-        - code
-    links:
-        - mysql
-    restart: always
+      - code
+    restart: unless-stopped
 
-cli:
-    extends:
-        file: docker-services.yml
-        service: cli_base
+  cli:
+    build: docker/images/cli
+    working_dir: /var/www
     volumes_from:
-        - code
+      - code
     volumes:
-        - "./.composer:/root/.composer"
-    links:
-        - mysql
+      - "./.composer:/root/.composer"
+    environment:
+      COMPOSER_ALLOW_SUPERUSER: 1
 
-nginx:
-    extends:
-        file: docker-services.yml
-        service: nginx_base
+  nginx:
+    build:
+      context: docker/images/nginx
+      args:
+        ENV: ${APP_ENV}
+        DOMAIN: ${APP_DOMAIN}
+    working_dir: /var/www
     volumes_from:
-        - code
-    links:
-        - fpm
-    restart: always
+      - code
+    ports:
+      - "${APP_PORT}:80"
+    volumes:
+      - "./volumes/nginx/:/var/log/nginx"
+    restart: unless-stopped
 
-mysql:
-    extends:
-        file: docker-services.yml
-        service: mysql_base
-    restart: always
+  es:
+    build: docker/images/es
+    ports:
+      - "${ES_PORT}:9200"
+    volumes:
+      - "./volumes/es/:/usr/share/elasticsearch/data"
+      - "./volumes/es/logs/:/usr/share/elasticsearch/log"

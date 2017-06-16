@@ -1,38 +1,146 @@
-Symfony docker environment
-=======
+# Symfony project
 
-## Install docker, docker-compose
+Description of Symfony project
 
-Install [docker](https://docs.docker.com/engine/installation/linux/ubuntulinux/) and [docker-compose](https://docs.docker.com/compose/install/) if not already installed on your computer.
+## Requirements
 
-You can add also [`docker-compose` auto-completion](https://docs.docker.com/compose/completion/)
+- docker (min 17.03.1-ce)
+- docker-compose (min 1.13.0)
 
-## Start/Stop docker containers
+## Install Symfony
+
+In order to install latest Symfony within `project/` folder you can run following command:
 
 ```bash
-./up # starts containers
-
-./stop # stops containers
+docker run -it -v $(pwd):/symfony ivanbarlog/symfony-installer new project && sudo chown -R $USER:$USER project
 ```
 
-## Access MySQL server
+or copy your symfony project over to `project/` folder.
 
-```mysql
-mysql -uroot -p -h0.0.0.0 -P3306
+## Initialize
+
+Following script will:
+- set up the dev domain within `/etc/hosts`
+- build and start development containers
+- populate application `parameters.yml`
+- installs dependencies over `composer`
+- create database if not exists
+- update database schema
+- fix file permissions
+
+```bash
+sudo ./bin/init {domain name}
 ```
 
-In order to run commands like `bin/console` within container run in via `docker-compose`:
+You need to specify `{domain name}` for instance `dev.project`. For further information please read the `init` file
+
+### parameters.yml.dist
+
+Parameters in `parameters.yml.dist` should look like this:
+
+```yml
+parameters:
+    database_host: db
+    database_port: 3306
+    database_name: {database name}
+    database_user: root
+    database_password: root
+    secret: {secret}
+    domain: dev.symfony # or whatever you have set up
 ```
-# in the root of the project
-docker-compose exec cli {command}
 
-# bin/console example
-docker-compose exec cli bin/console d:s:u --force
+### app_dev.php
 
-# you can run bash within the container as well
-docker-compose exec cli bash
+It is absolutely safe to remove following lines from `project/web/app_dev.php` since it is disabled in `prod` environment by nginx:
+
+```php
+// This check prevents access to debug front controllers that are deployed by accident to production servers.
+// Feel free to remove this, extend it, or make something more sophisticated.
+if (isset($_SERVER['HTTP_CLIENT_IP'])
+    || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+    || !(in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']) || PHP_SAPI === 'cli-server')
+) {
+    header('HTTP/1.0 403 Forbidden');
+    exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
+}
 ```
 
-### Access web
+## Docker commands
 
-- [localhost:8080](http://localhost:8080/app_dev.php)
+```bash
+./up # up containers
+./stop # stop containers
+./down # stop and remove containers
+./compose # wrapper for docker-compose - see docker-compose documentation
+
+# example of SSH-ing to CLI container (one time)
+./compose run -rm cli bash
+
+# example of SSH-int to running container (so you have history of commands)
+./compose run cli bash # first run the container
+./compose exec cli bash # then after exiting from container you can start the same container so your history is available
+```
+
+If you are having problems with permissions after running Symfony commands, please do run following command as root from your local machine (not docker container):
+
+```bash
+sudo ./bin/fix-permissions
+```
+
+## Connect to database
+
+```bash
+./compose exec db mysql -uroot -p
+```
+
+## Checks and tests
+
+All of following commands can be run separately from your command line (from host machine). All of the commands runs also as `pre-commit` git hook.
+
+```bash
+./bin/unit-test # runs phpunit
+./bin/format-code # runs php-cs-fixer
+./bin/mess-detect # runs phpmd
+```
+
+## Environment Symfony configuration
+
+Copy `./env/symfony.env.dist` to `./env/symfony.env` and set up API keys.
+
+You can access the environment variables within Symfony's config file like this:
+
+```yaml
+# project/app/config/config.yml
+
+everlution_file_jet:
+  storages:
+    - id: "%env(FILE_JET_ID)%"
+      api_key: "%env(FILE_JET_API_KEY)%"
+      name: default
+```
+
+## Links and ports
+
+- [dev.symfony](http://dev.symfony/app_dev.php)
+
+If you want to change default ports, please copy `./env/docker.env.dist` to `./env/docker.env` and set up your custom ports there. You should also set up the domain name there.
+
+## Git pre-commit hook
+
+You should create `.git/hooks/pre-commit` with following content:
+
+```bash
+#!/usr/bin/env bash
+
+set -e
+
+./bin/format-code
+./bin/mess-detect
+./bin/unit-test
+```
+
+Also don't forget to make it executable:
+
+```bash
+chmod +x .git/hooks/pre-commit
+```

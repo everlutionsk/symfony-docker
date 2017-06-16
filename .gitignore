@@ -1,2 +1,6 @@
-/volumes
-/.composer
+.idea/
+.composer
+volumes/
+project/phpunit/
+env/docker.env
+env/symfony.env
