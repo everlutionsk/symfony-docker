@@ -30,3 +30,5 @@ RUN echo "alias bower='bower --allow-root'" >> ~/.bashrc
 
 # Add composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+CMD ["php", "-a"]

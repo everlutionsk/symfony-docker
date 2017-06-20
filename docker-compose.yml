@@ -15,6 +15,7 @@ services:
   cli:
     build: docker/images/cli
     working_dir: /var/www
+    tty: true
     volumes_from:
       - code
     volumes:
