@@ -74,11 +74,7 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
 ./compose # wrapper for docker-compose - see docker-compose documentation
 
 # example of SSH-ing to CLI container (one time)
-./compose run -rm cli bash
-
-# example of SSH-int to running container (so you have history of commands)
-./compose run cli bash # first run the container
-./compose exec cli bash # then after exiting from container you can start the same container so your history is available
+./compose exec cli bash
 ```
 
 If you are having problems with permissions after running Symfony commands, please do run following command as root from your local machine (not docker container):

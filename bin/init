@@ -29,14 +29,14 @@ sudo -u ${SUDO_USER} ./up
 
 # uncomment if applicable
 # echo -e "\e[30;48;5;82m INSTALLING BOWER \e[0m"
-# sudo -u ${SUDO_USER} ./compose run --rm cli bower install --allow-root
+# sudo -u ${SUDO_USER} ./compose exec cli bower install --allow-root
 
 echo -e "\e[30;48;5;82m INSTALLING COMPOSER \e[0m"
 sudo -u ${SUDO_USER} cp project/app/config/parameters.yml.dist project/app/config/parameters.yml
-sudo -u ${SUDO_USER} ./compose run --rm cli composer install
+sudo -u ${SUDO_USER} ./compose exec cli composer install
 
 echo -e "\e[30;48;5;82m INITIALIZE DATABASE \e[0m"
-sudo -u ${SUDO_USER} ./compose run --rm cli bin/console d:d:c --if-not-exists
-sudo -u ${SUDO_USER} ./compose run --rm cli bin/console d:s:u --force
+sudo -u ${SUDO_USER} ./compose exec cli bin/console d:d:c --if-not-exists
+sudo -u ${SUDO_USER} ./compose exec cli bin/console d:s:u --force
 
 ./bin/fix-permissions

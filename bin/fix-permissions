@@ -12,6 +12,6 @@ if [ "${SUDO_USER}" == "root" ]; then
     exit
 fi
 
-chown -R www-data:www-data project/var/cache
-chown -R www-data:www-data project/var/logs
-chown -R www-data:www-data project/var/sessions
+chown -R 33:33 project/var/cache
+chown -R 33:33 project/var/logs
+chown -R 33:33 project/var/sessions
