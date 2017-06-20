@@ -99,7 +99,7 @@ All of following commands can be run separately from your command line (from hos
 
 ```bash
 ./bin/unit-test # runs phpunit
-./bin/format-code-check # runs php-cs-fixer
+./bin/format-code # runs php-cs-fixer
 ./bin/mess-detect # runs phpmd
 ```
 
@@ -134,7 +134,7 @@ You should create `.git/hooks/pre-commit` with following content:
 
 set -e
 
-./bin/format-code
+./bin/format-code-check
 ./bin/mess-detect
 ./bin/unit-test
 ```
