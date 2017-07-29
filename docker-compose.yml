@@ -29,6 +29,8 @@ services:
       args:
         ENV: ${APP_ENV}
         DOMAIN: ${APP_DOMAIN}
+        USER: ${BASE_AUTH_USER}
+        PASSWORD: ${BASE_AUTH_PASSWORD}
     working_dir: /var/www
     volumes_from:
       - code
