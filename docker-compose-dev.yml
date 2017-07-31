@@ -9,6 +9,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - "./volumes/mysql/:/var/lib/mysql"
+      - "./volumes/sqldump/:/sqldump"
+    working_dir: /sqldump
     restart: unless-stopped
 
   fpm:
