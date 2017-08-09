@@ -10,6 +10,8 @@ services:
     working_dir: /var/www
     volumes_from:
       - code
+    env_file:
+      - ./env/symfony.env
     restart: unless-stopped
 
   cli:
@@ -22,7 +24,9 @@ services:
       - "./.composer:/root/.composer"
     environment:
       COMPOSER_ALLOW_SUPERUSER: 1
-
+    env_file:
+      - ./env/symfony.env
+      
   nginx:
     build:
       context: docker/images/nginx
