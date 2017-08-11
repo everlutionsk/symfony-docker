@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
+# ./compose up
+# ./compose stop
+# ./compose down
+# ./compose *
+# ./compose exec cli bin/console d:s:u --force
+
+if [ ! -f ./ops/env/docker.env ] || [ ! -f ./ops/env/symfony.env ]; then
+    echo -e "\e[01;31mYou need to create ./ops/env/docker.env and ./ops/env/symfony.env files. Check README.md for more informations.\e[0m"
+    exit 1
+fi
 
 if [ -f "env/docker.env" ]; then
-    source ./env/docker.env
+    source ./ops/env/docker.env
 fi
 
 # Set environment variables for compose
@@ -15,14 +25,26 @@ export BASE_AUTH_PASSWORD=${SYMFONY_BASE_AUTH_PASSWORD:-password}
 echo -e "\e[96m ENV=$APP_ENV; DOMAIN=$APP_DOMAIN \e[0m"
 
 if [ "$APP_ENV" == "prod" ]; then
-    COMPOSE_FILE="-f docker-compose.yml"
+    COMPOSE_FILE="-f ./ops/docker-compose.yml"
 else
-    COMPOSE_FILE="-f docker-compose.yml -f docker-compose-dev.yml"
+    COMPOSE_FILE="-f ./ops/docker-compose.yml -f ./ops/docker-compose-dev.yml"
     export DB_PORT=${SYMFONY_DB_PORT:-3306}
 fi
 
-if [ $# -gt 0 ]; then
-    docker-compose $COMPOSE_FILE "$@"
-else
-    docker-compose $COMPOSE_FILE ps
+if [ $1 = "up" ]; then
+    echo -e "\e[42m STOP, BUILD and UP CONTAINERS \e[0m" && \
+    docker-compose $COMPOSE_FILE stop && \
+    docker-compose $COMPOSE_FILE build && \
+    docker-compose $COMPOSE_FILE up -d && \
+    exit 0
+elif [ $1 = "down" ]; then
+    echo -e "\e[41m STOP & REMOVE CONTAINERS \e[0m"
+    docker rm -f $(docker ps -a -q) && \
+    exit 0
+elif [ $1 = "stop" ]; then
+    echo -e "\e[41m STOP CONTAINERS \e[0m"
+    docker-compose $COMPOSE_FILE stop && \
+    exit 0
 fi
+
+docker-compose $COMPOSE_FILE "$@"

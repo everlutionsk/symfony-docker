@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-echo -e "\e[41m STOP CONTAINERS \e[0m"
-
-./compose stop
