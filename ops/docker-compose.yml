@@ -1,12 +1,14 @@
 version: '2'
 services:
   code:
-    build: docker/images/code
+    container_name: code
+    build: images/code
     volumes:
-      - "./project:/var/www"
+      - "../project:/var/www"
 
   fpm:
-    build: docker/images/fpm
+    container_name: fpm
+    build: images/fpm
     working_dir: /var/www
     volumes_from:
       - code
@@ -15,7 +17,8 @@ services:
     restart: unless-stopped
 
   cli:
-    build: docker/images/cli
+    container_name: cli
+    build: images/cli
     working_dir: /var/www
     tty: true
     volumes_from:
@@ -28,8 +31,9 @@ services:
       - ./env/symfony.env
       
   nginx:
+    container_name: nginx
     build:
-      context: docker/images/nginx
+      context: images/nginx
       args:
         ENV: ${APP_ENV}
         DOMAIN: ${APP_DOMAIN}
@@ -45,7 +49,8 @@ services:
     restart: unless-stopped
 
   es:
-    build: docker/images/es
+    container_name: es
+    build: images/es
     ports:
       - "${ES_PORT}:9200"
     volumes:

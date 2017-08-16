@@ -4,8 +4,14 @@ Description of Symfony project
 
 ## Requirements
 
-- docker (min 17.03.1-ce)
-- docker-compose (min 1.13.0)
+- __Docker__ (min 17.03.1-ce)
+(
+[Ubuntu](https://docs.docker.com/installation/ubuntulinux/) /
+[Debian](https://docs.docker.com/installation/debian/) /
+[OSX](https://docs.docker.com/installation/mac/) /
+[Others](https://docs.docker.com/installation/ubuntulinux/)
+)
+- __Docker compose__ (min 1.13.0) ([All OSes](http://docs.aws.amazon.com/cli/latest/userguide/installing.html#install-bundle-other-os))
 
 ## Install Symfony
 
@@ -28,11 +34,12 @@ Following script will:
 - update database schema
 - fix file permissions
 
-```bash
-sudo ./bin/init {domain name}
-```
+You need to specify `{domain name}`, for example `dev.project`. For further information please read the `init` file
 
-You need to specify `{domain name}` for instance `dev.project`. For further information please read the `init` file
+```bash
+# sudo ./ops/bin/init dev.symfony
+sudo ./ops/bin/init {domain name}
+```
 
 ### parameters.yml.dist
 
@@ -40,7 +47,7 @@ Parameters in `parameters.yml.dist` should look like this:
 
 ```yml
 parameters:
-    database_host: db
+    database_host: mysql
     database_port: 3306
     database_name: {database name}
     database_user: root
@@ -67,20 +74,24 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
 
 ## Docker commands
 
+Remember, for anything you need to do with docker always use `./compose` script
+
 ```bash
-./up # up containers
-./stop # stop containers
-./down # stop and remove containers
-./compose # wrapper for docker-compose - see docker-compose documentation
+./compose up # up containers
+./compose stop # stop containers
+./compose down # stop and remove containers
+./compose * # wrapper for docker-compose - see docker-compose documentation, replace * with the command you want to execute
 
 # example of SSH-ing to CLI container (one time)
 ./compose exec cli bash
 ```
 
+## Fixing permissions
+
 If you are having problems with permissions after running Symfony commands, please do run following command as root from your local machine (not docker container):
 
 ```bash
-sudo ./bin/fix-permissions
+sudo ./ops/bin/fix-permissions
 ```
 
 ## Connect to database

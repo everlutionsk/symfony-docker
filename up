@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-echo -e "\e[42m STOP, BUILD and UP CONTAINERS \e[0m"
-
-./compose stop
-./compose build
-./compose up -d
