@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-docker run -v $(pwd)/project:/app ivanbarlog/php-test phpunit --log-junit phpunit/junit.xml --exclude-group dev-test

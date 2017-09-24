@@ -9,7 +9,7 @@ Description of Symfony project
 
 ## Install Symfony
 
-In order to install latest Symfony within `project/` folder you can run following command:
+In order to install latest Symfony within `project/` folder you can run following command (before running it you actually need to remove `project/` folder):
 
 ```bash
 docker run -it -v $(pwd):/symfony ivanbarlog/symfony-installer new project && sudo chown -R $USER:$USER project
@@ -22,14 +22,14 @@ or copy your symfony project over to `project/` folder.
 Following script will:
 - set up the dev domain within `/etc/hosts`
 - build and start development containers
-- populate application `parameters.yml`
+- copy `parameters.yml.dist` over to `parameters.yml`
 - installs dependencies over `composer`
 - create database if not exists
 - update database schema
 - fix file permissions
 
 ```bash
-sudo ./bin/init {domain name}
+./ops init {domain name}
 ```
 
 You need to specify `{domain name}` for instance `dev.project`. For further information please read the `init` file
@@ -43,10 +43,6 @@ parameters:
     database_host: db
     database_port: 3306
     database_name: {database name}
-    database_user: root
-    database_password: root
-    secret: {secret}
-    domain: dev.symfony # or whatever you have set up
 ```
 
 ### app_dev.php
@@ -65,38 +61,39 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
 }
 ```
 
+You can remove any other code from `app_dev.php` and `app.php` which is related to PHP version lower then `7.0`.
+
 ## Docker commands
 
-```bash
-./up # up containers
-./stop # stop containers
-./down # stop and remove containers
-./compose # wrapper for docker-compose - see docker-compose documentation
+The project provides `docker-compose` wrapper which can be invoked by `./ops`. Here are commands which can be used:
 
-# example of SSH-ing to CLI container (one time)
-./compose exec cli bash
+```bash
+./ops init {domain} # initializes the project from scratch
+./ops up # brings containers up
+./ops stop # stops containers
+./ops down # stops and removes containers
+./ops bin/console # runs Symfony's bin/console within cli container
+./ops composer # runs composer within cli container
+./ops npm # runs npm within node container
+./ops encore # runs encore within cli container (you need to install encore and set-up your project for proper use with Symfony's webpack first)
+./ops check-code # checks your src/ and tests/ with php-cs-fixer and phpmd utilities
+./ops test # run tests with phpunit
+./ops permissions # fixes permissions in var/ folder
+./ops mysql # runs mysql within db container
+
+./ops # wrapper for docker-compose - see docker-compose documentation
 ```
 
 If you are having problems with permissions after running Symfony commands, please do run following command as root from your local machine (not docker container):
 
 ```bash
-sudo ./bin/fix-permissions
+./ops permission
 ```
 
 ## Connect to database
 
 ```bash
-./compose exec db mysql -uroot -p
-```
-
-## Checks and tests
-
-All of following commands can be run separately from your command line (from host machine). All of the commands runs also as `pre-commit` git hook.
-
-```bash
-./bin/unit-test # runs phpunit
-./bin/format-code # runs php-cs-fixer
-./bin/mess-detect # runs phpmd
+./ops mysql -uroot -p
 ```
 
 ## Environment Symfony configuration
@@ -121,22 +118,65 @@ everlution_file_jet:
 
 If you want to change default ports, please copy `./env/docker.env.dist` to `./env/docker.env` and set up your custom ports there. You should also set up the domain name there.
 
-## Git pre-commit hook
+## Setup Symfony Encore (webpack)
 
-You should create `.git/hooks/pre-commit` with following content:
-
-```bash
-#!/usr/bin/env bash
-
-set -e
-
-./bin/format-code-check
-./bin/mess-detect
-./bin/unit-test
-```
-
-Also don't forget to make it executable:
+Create `assets` and `build` folders:
 
 ```bash
-chmod +x .git/hooks/pre-commit
+mkdir -p project/assets/js
+touch project/assets/js/main.js
+mkdir -p project/assets/scss
+touch project/assets/scss/global.scss
+mkdir -p project/web/build
 ```
+
+Add `node_modules` and `build` folder to `.gitignore`:
+
+```bash
+echo "node_modules" >> project/.gitignore
+echo "web/build" >> project/.gitignore
+```
+
+Create `webpack.config.js` within the `project` folder:
+
+```javascript
+var Encore = require('@symfony/webpack-encore');
+
+Encore
+    .setOutputPath('web/build/')
+    .setPublicPath('/build')
+    .cleanupOutputBeforeBuild()
+    .addEntry('app', './assets/js/main.js')
+    .addStyleEntry('global', './assets/scss/global.scss')
+    .enableSassLoader()
+    .autoProvidejQuery()
+    .enableSourceMaps(!Encore.isProduction())
+    .enableVersioning()
+;
+
+module.exports = Encore.getWebpackConfig();
+```
+
+Enable asset versioning in Symfony's config:
+
+```yaml
+framework:
+    assets:
+        json_manifest_path: '%kernel.project_dir%/web/build/manifest.json'
+```
+
+Initialize `npm` package within your `project` file - this will be used for managing frontend dependencies instead of `bower`:
+
+```bash
+./ops npm init # follow the instructions
+```
+
+Install `encore` and other dependencies:
+
+```bash
+./ops npm install @symfony/webpack-encore --save-dev
+./ops npm install node-sass --save-dev
+./ops npm install sass-loader --save-dev
+```
+
+Read more about [Managing CSS and JavaScript](https://symfony.com/doc/current/frontend.html)

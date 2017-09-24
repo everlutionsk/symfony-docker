@@ -3,7 +3,7 @@ services:
   code:
     build: docker/images/code
     volumes:
-      - "./project:/var/www"
+      - "../project:/var/www"
 
   fpm:
     build: docker/images/fpm
@@ -27,7 +27,13 @@ services:
       COMPOSER_AUTH: '{"github.com": "${GITHUB_PERSONAL_ACCESS_KEY}"}'
     env_file:
       - ./env/symfony.env
-      
+
+  node:
+    image: node:8
+    working_dir: /var/www
+    volumes_from:
+      - code
+
   nginx:
     build:
       context: docker/images/nginx

@@ -1,4 +1,4 @@
-FROM nginx:1.13.0
+FROM nginx:1.13.5
 
 ARG ENV=dev
 ARG DOMAIN=dev.symfony

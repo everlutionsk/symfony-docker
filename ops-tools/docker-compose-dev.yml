@@ -15,3 +15,11 @@ services:
 
   fpm:
     build: docker/images/fpm-dev
+
+  test:
+    image: everlutionsk/php-test
+    working_dir: /var/www
+    volumes_from:
+      - code
+    env_file:
+      - ./env/symfony.env

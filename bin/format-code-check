@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-docker run -v $(pwd)/project:/app ivanbarlog/php-test php-cs-fixer fix src/ --dry-run --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align
-docker run -v $(pwd)/project:/app ivanbarlog/php-test php-cs-fixer fix tests/ --dry-run --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align

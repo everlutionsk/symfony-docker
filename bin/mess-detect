@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-docker run -v $(pwd)/project:/app ivanbarlog/php-test phpmd src/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php
-docker run -v $(pwd)/project:/app ivanbarlog/php-test phpmd tests/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php

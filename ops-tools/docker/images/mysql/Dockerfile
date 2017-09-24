@@ -1,4 +1,4 @@
-FROM mysql:5.7.18
+FROM mysql:5.7
 
 RUN mkdir /sqldump
 
