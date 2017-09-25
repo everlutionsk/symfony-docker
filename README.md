@@ -96,6 +96,12 @@ If you are having problems with permissions after running Symfony commands, plea
 ./ops mysql -uroot -p
 ```
 
+## Importing & Exporting database
+
+`db` container has attached special volume which can be used to import/export database. It's located in `infrastructure/volumes/sqldump` and within container it maps to `/sqldump`.
+
+Hence you can copy your MySQL dump to `infrastructure/volumes/sqldump` and source it from MySQL console (checkout __Connect to database__) from `/sqldump`. Also you can export your database to `/sqldump` and access it in `infrastructure/volumes/sqldump`.
+
 ## Environment Symfony configuration
 
 Copy `./env/symfony.env.dist` to `./env/symfony.env` and set up API keys.

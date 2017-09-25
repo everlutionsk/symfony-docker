@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 
-OPS_TOOLS="ops-tools"
-
 # directory where this script is located
 cd $(dirname "$0")
 
-if [ ! -f ./$OPS_TOOLS/env/symfony.env ]; then
-    echo -e "\e[01;31mYou need to create ./ops-tools/env/symfony.env file. Check README.md for more information.\e[0m"
+if [ ! -f ./infrastructure/env/symfony.env ]; then
+    echo -e "\e[01;31mYou need to create ./infrastructure/env/symfony.env file. Check README.md for more information.\e[0m"
     exit 1
 fi
 
-if [ -f "./$OPS_TOOLS/env/docker.env" ]; then
-    source ./$OPS_TOOLS/env/docker.env
+if [ -f "./infrastructure/env/docker.env" ]; then
+    source ./infrastructure/env/docker.env
 fi
 
 # Set environment variables for compose
@@ -25,9 +23,9 @@ export BASE_AUTH_PASSWORD=${SYMFONY_BASE_AUTH_PASSWORD:-password}
 echo -e "\e[96m ENV=$APP_ENV; DOMAIN=$APP_DOMAIN \e[0m"
 
 if [ "$APP_ENV" == "prod" ]; then
-    COMPOSE="docker-compose -p ${PWD##*/} -f $OPS_TOOLS/docker-compose.yml"
+    COMPOSE="docker-compose -p ${PWD##*/} -f infrastructure/docker-compose.yml"
 else
-    COMPOSE="docker-compose -p ${PWD##*/} -f $OPS_TOOLS/docker-compose.yml -f $OPS_TOOLS/docker-compose-dev.yml"
+    COMPOSE="docker-compose -p ${PWD##*/} -f infrastructure/docker-compose.yml -f infrastructure/docker-compose-dev.yml"
     export DB_PORT=${SYMFONY_DB_PORT:-3306}
 fi
 
@@ -37,7 +35,7 @@ if [ $# -gt 0 ]; then
     #
     if [ "$1" == "init" ]; then
         shift 1
-        sudo ./$OPS_TOOLS/bin/init "$@"    #
+        sudo ./infrastructure/bin/init "$@"    #
     # up
     #
     elif [ "$1" == "up" ]; then
@@ -95,7 +93,7 @@ if [ $# -gt 0 ]; then
     # permissions
     #
     elif [ "$1" == "permissions" ]; then
-        sudo ./$OPS_TOOLS/bin/fix-permissions
+        sudo ./infrastructure/bin/fix-permissions
     #
     # mysql
     #

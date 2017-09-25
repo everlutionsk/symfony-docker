@@ -1,12 +1,12 @@
 version: '2'
 services:
   code:
-    build: docker/images/code
+    build: docker-images/code
     volumes:
       - "../project:/var/www"
 
   fpm:
-    build: docker/images/fpm
+    build: docker-images/fpm
     working_dir: /var/www
     volumes_from:
       - code
@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   cli:
-    build: docker/images/cli
+    build: docker-images/cli
     working_dir: /var/www
     tty: true
     volumes_from:
@@ -36,7 +36,7 @@ services:
 
   nginx:
     build:
-      context: docker/images/nginx
+      context: docker-images/nginx
       args:
         ENV: ${APP_ENV}
         DOMAIN: ${APP_DOMAIN}
@@ -52,7 +52,7 @@ services:
     restart: unless-stopped
 
   es:
-    build: docker/images/es
+    build: docker-images/es
     ports:
       - "${ES_PORT}:9200"
     volumes:

@@ -35,4 +35,4 @@ echo -e "\e[30;48;5;82m INITIALIZE DATABASE \e[0m"
 sudo -u ${SUDO_USER} ./ops bin/console d:d:c --if-not-exists
 sudo -u ${SUDO_USER} ./ops bin/console d:s:u --force
 
-./ops-tools/bin/fix-permissions
+./infrastructure/bin/fix-permissions
