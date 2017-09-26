@@ -33,6 +33,7 @@ services:
     working_dir: /var/www
     volumes_from:
       - code
+    tty: true
 
   nginx:
     build:
