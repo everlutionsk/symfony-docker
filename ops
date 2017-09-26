@@ -67,28 +67,28 @@ if [ $# -gt 0 ]; then
     #
     elif [ "$1" == "npm" ]; then
         shift 1
-        $COMPOSE run --rm -w /var/www node npm "$@"
+        $COMPOSE exec -w /var/www node npm "$@"
     #
     # encore
     #
     elif [ "$1" == "encore" ]; then
         shift 1
-        $COMPOSE run --rm -w /var/www node ./node_modules/.bin/encore "$@"
+        $COMPOSE exec -w /var/www node ./node_modules/.bin/encore "$@"
     #
     # check-code
     #
     elif [ "$1" == "check-code" ]; then
         # php-cs-fixer on src/ and tests/
-        $COMPOSE run --rm test php-cs-fixer fix src/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
-        $COMPOSE run --rm test php-cs-fixer fix tests/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
+        $COMPOSE exec test php-cs-fixer fix src/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
+        $COMPOSE exec test php-cs-fixer fix tests/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
         # phpmd on src/ and tests/
-        $COMPOSE run --rm test phpmd src/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php && \
-        $COMPOSE run --rm test phpmd tests/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php
+        $COMPOSE exec test phpmd src/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php && \
+        $COMPOSE exec test phpmd tests/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php
     #
     # test
     #
     elif [ "$1" == "test" ]; then
-        $COMPOSE run --rm test phpunit --log-junit phpunit/junit.xml
+        $COMPOSE exec test phpunit --log-junit phpunit/junit.xml
     #
     # permissions
     #
