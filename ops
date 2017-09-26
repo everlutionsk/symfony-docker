@@ -67,13 +67,13 @@ if [ $# -gt 0 ]; then
     #
     elif [ "$1" == "npm" ]; then
         shift 1
-        $COMPOSE exec -w /var/www node npm "$@"
+        $COMPOSE exec node npm "$@"
     #
     # encore
     #
     elif [ "$1" == "encore" ]; then
         shift 1
-        $COMPOSE exec -w /var/www node ./node_modules/.bin/encore "$@"
+        $COMPOSE exec node ./node_modules/.bin/encore "$@"
     #
     # check-code
     #
