@@ -4,7 +4,8 @@
 cd $(dirname "$0")
 
 if [ ! -f ./infrastructure/env/symfony.env ]; then
-    echo -e "\e[01;31mYou need to create ./infrastructure/env/symfony.env file. Check README.md for more information.\e[0m"
+    cp ./infrastructure/env/symfony.env.dist ./infrastructure/env/symfony.env
+    echo -e "\e[01;31mThe ./infrastructure/env/symfony.env file has been created. Please change it according to README.md before continuing.\e[0m"
     exit 1
 fi
 
