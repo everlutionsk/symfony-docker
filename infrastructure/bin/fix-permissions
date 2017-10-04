@@ -14,7 +14,7 @@ fi
 
 chown -R 33:33 project/var/cache
 chown -R 33:33 project/var/logs
-# sessions can be handled in database
+# sessions can be stored in database
 if [ -d "project/var/sessions" ]; then
     chown -R 33:33 project/var/sessions
 fi
