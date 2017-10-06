@@ -36,7 +36,8 @@ if [ $# -gt 0 ]; then
     #
     if [ "$1" == "init" ]; then
         shift 1
-        sudo ./infrastructure/bin/init "$@"    #
+        sudo ./infrastructure/bin/init "$@"
+    #
     # up
     #
     elif [ "$1" == "up" ]; then
