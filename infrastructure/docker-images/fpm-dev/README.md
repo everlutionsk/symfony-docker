@@ -11,4 +11,6 @@ RUN apt-get install -y --no-install-recommends \
     
 RUN docker-php-ext-configure gd --enable-gd-native-ttf --with-jpeg-dir=/usr/lib/x86_64-linux-gnu --with-png-dir=/usr/lib/x86_64-linux-gnu --with-freetype-dir=/usr/lib/x86_64-linux-gnu
 RUN docker-php-ext-install exif gd
+
+RUN pecl install imagick && docker-php-ext-enable imagick
 ```
