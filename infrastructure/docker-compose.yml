@@ -24,7 +24,7 @@ services:
       - "./.composer:/root/.composer"
     environment:
       COMPOSER_ALLOW_SUPERUSER: 1
-      COMPOSER_AUTH: '{"github.com": "${GITHUB_PERSONAL_ACCESS_KEY}"}'
+      COMPOSER_AUTH: '{ "github-oauth": { "github.com": "$GITHUB_PERSONAL_ACCESS_KEY" } }'
     env_file:
       - ./env/symfony.env
 
