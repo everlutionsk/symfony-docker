@@ -30,80 +30,9 @@ else
     export DB_PORT=${SYMFONY_DB_PORT:-3306}
 fi
 
-if [ $# -gt 0 ]; then
-    #
-    # init
-    #
-    if [ "$1" == "init" ]; then
-        shift 1
-        sudo ./infrastructure/bin/init "$@"
-    #
-    # up
-    #
-    elif [ "$1" == "up" ]; then
-        $COMPOSE stop && $COMPOSE build && $COMPOSE up -d
-    #
-    # stop
-    #
-    elif [ "$1" == "stop" ]; then
-        $COMPOSE stop
-    #
-    # down
-    #
-    elif [ "$1" == "down" ]; then
-        $COMPOSE down
-    #
-    # bin/console
-    #
-    elif [ "$1" == "bin/console" ]; then
-        shift 1
-        $COMPOSE exec cli bin/console "$@"
-    #
-    # composer
-    #
-    elif [ "$1" == "composer" ]; then
-        shift 1
-        $COMPOSE exec cli composer "$@"
-    #
-    # npm
-    #
-    elif [ "$1" == "npm" ]; then
-        shift 1
-        $COMPOSE exec node npm "$@"
-    #
-    # encore
-    #
-    elif [ "$1" == "encore" ]; then
-        shift 1
-        $COMPOSE exec node ./node_modules/.bin/encore "$@"
-    #
-    # check-code
-    #
-    elif [ "$1" == "check-code" ]; then
-        # php-cs-fixer on src/ and tests/
-        $COMPOSE exec test php-cs-fixer fix src/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
-        $COMPOSE exec test php-cs-fixer fix tests/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
-        # phpmd on src/ and tests/
-        $COMPOSE exec test phpmd src/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php && \
-        $COMPOSE exec test phpmd tests/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php
-    #
-    # test
-    #
-    elif [ "$1" == "test" ]; then
-        $COMPOSE exec test phpunit --log-junit phpunit/junit.xml
-    #
-    # permissions
-    #
-    elif [ "$1" == "permissions" ]; then
-        sudo ./infrastructure/bin/fix-permissions
-    #
-    # mysql
-    #
-    elif [ "$1" == "mysql" ]; then
-        shift 1
-        $COMPOSE exec db mysql "$@"
-    elif [ "$1" == "help" ]; then
-        echo "usage: ./ops [command] [argument, ...]
+print_help () {
+echo "Usage: $0 [command] [argument, ...]
+
 init {domain} - initializes the project from scratch
 up - brings containers up
 stop - stops containers
@@ -115,10 +44,67 @@ encore - runs encore within cli container (you need to install encore and set-up
 check-code - checks your src/ and tests/ with php-cs-fixer and phpmd utilities
 test - run tests with phpunit
 permissions - fixes permissions in var/ folder
-mysql - runs mysql within db container"
-    else
-        $COMPOSE "$@"
-    fi
-else
-    $COMPOSE ps
+mysql - runs mysql within db container
+compose - wrapper for docker-compose"
+exit 1
+}
+
+if [ $# -lt 1 ]; then
+    print_help
 fi
+
+case "$1" in
+    init)
+        shift 1
+        sudo ./infrastructure/bin/init "$@"
+        ;;
+    up)
+        $COMPOSE stop && $COMPOSE build && $COMPOSE up -d
+        ;;
+    stop)
+        $COMPOSE stop
+        ;;
+    down)
+        $COMPOSE down
+        ;;
+    bin/console)
+        shift 1
+        $COMPOSE exec cli bin/console "$@"
+        ;;
+    composer)
+        shift 1
+        $COMPOSE exec cli composer "$@"
+        ;;
+    npm)
+        shift 1
+        $COMPOSE exec node npm "$@"
+        ;;
+    encore)
+        shift 1
+        $COMPOSE exec node ./node_modules/.bin/encore "$@"
+        ;;
+    check-code)
+        # php-cs-fixer on src/ and tests/
+        $COMPOSE exec test php-cs-fixer fix src/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
+        $COMPOSE exec test php-cs-fixer fix tests/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
+        # phpmd on src/ and tests/
+        $COMPOSE exec test phpmd src/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php && \
+        $COMPOSE exec test phpmd tests/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php
+        ;;
+    test)
+        $COMPOSE exec test phpunit --log-junit phpunit/junit.xml
+        ;;
+    permissions)
+        sudo ./infrastructure/bin/fix-permissions
+        ;;
+    mysql)
+        shift 1
+        $COMPOSE exec db mysql "$@"
+        ;;
+    compose)
+        shift 1
+        $COMPOSE "$@"
+        ;;
+    *)
+        print_help
+esac
