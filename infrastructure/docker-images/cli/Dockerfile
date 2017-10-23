@@ -18,8 +18,6 @@ RUN docker-php-ext-install mcrypt pdo_mysql mysqli intl mbstring zip pcntl
 RUN locale-gen en_US en_US.UTF-8 sk_SK sk_SK.UTF-8
 RUN dpkg-reconfigure -f noninteractive locales
 
-RUN docker-php-ext-install mcrypt pdo_mysql mysqli intl mbstring gd exif zip pcntl
-
 # Add composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
