@@ -70,6 +70,7 @@ case "$1" in
     bin/console)
         shift 1
         $COMPOSE exec cli bin/console "$@"
+        sudo ./infrastructure/bin/fix-permissions
         ;;
     composer)
         shift 1
