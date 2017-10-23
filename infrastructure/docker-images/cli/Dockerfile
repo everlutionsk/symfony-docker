@@ -18,9 +18,6 @@ RUN docker-php-ext-install mcrypt pdo_mysql mysqli intl mbstring zip pcntl
 RUN locale-gen en_US en_US.UTF-8 sk_SK sk_SK.UTF-8
 RUN dpkg-reconfigure -f noninteractive locales
 
-COPY app.ini /usr/local/etc/php/conf.d/app.ini
-COPY app.pool.conf /usr/local/etc/php/pool.d/app.pool.conf
-
 RUN docker-php-ext-install mcrypt pdo_mysql mysqli intl mbstring gd exif zip pcntl
 
 # Add composer
