@@ -37,6 +37,7 @@ init {domain} - initializes the project from scratch
 up - brings containers up
 stop - stops containers
 down - stops and removes containers
+restart - stops, rebuilds and starts specified containers eg. '$0 restart nginx fpm' will restart nginx and fpm
 bin/console - runs Symfony's bin/console within cli container
 composer - runs composer within cli container
 npm - runs npm within node container
@@ -66,6 +67,10 @@ case "$1" in
         ;;
     down)
         $COMPOSE down
+        ;;
+    restart)
+        shift 1
+        $COMPOSE stop "$@" && $COMPOSE build "$@" && $COMPOSE up -d "$@"
         ;;
     bin/console)
         shift 1
