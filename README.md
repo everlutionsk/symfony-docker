@@ -90,6 +90,12 @@ If you are having problems with permissions after running Symfony commands, plea
 ./ops permission
 ```
 
+### Add autocompletion for `ops`
+
+``` 
+source ./infrastructure/.completion
+```
+
 ## Connect to database
 
 ```bash
