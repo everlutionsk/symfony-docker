@@ -1,0 +1,18 @@
+_ops() 
+{
+    # declare variable `cur' (holds string to complete) as local
+    local cur
+
+    # initialize completion (abort on fail)
+    _init_completion || return
+
+    if [[ "$cur" == * ]] ; then
+        # complete to the following strings, if they start with `cur`
+        COMPREPLY=( $( compgen -W 'init up stop down restart bin/console composer npm encore check-code test permissions mysql compose' -- "$cur" ) )
+    else
+        # otherwise, complete to elements in current directory that begin with `cur'
+        _filedir -d
+    fi
+
+} && complete -F _ops ./ops
+
