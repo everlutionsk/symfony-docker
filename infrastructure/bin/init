@@ -27,6 +27,9 @@ fi
 echo -e "\e[30;48;5;82m STARTING DOCKER CONTAINERS \e[0m"
 sudo -u ${SUDO_USER} ./ops up
 
+echo -e "\e[30;48;5;82m FIXING PERMISSIONS \e[0m"
+sudo -u ${SUDO_USER} ./ops permissions
+
 echo -e "\e[30;48;5;82m INSTALLING COMPOSER \e[0m"
 sudo -u ${SUDO_USER} cp project/app/config/parameters.yml.dist project/app/config/parameters.yml
 sudo -u ${SUDO_USER} ./ops composer install
@@ -34,5 +37,3 @@ sudo -u ${SUDO_USER} ./ops composer install
 echo -e "\e[30;48;5;82m INITIALIZE DATABASE \e[0m"
 sudo -u ${SUDO_USER} ./ops bin/console d:d:c --if-not-exists
 sudo -u ${SUDO_USER} ./ops bin/console d:s:u --force
-
-./infrastructure/bin/fix-permissions

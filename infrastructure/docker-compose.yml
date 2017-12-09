@@ -1,12 +1,12 @@
 version: '2'
 services:
   code:
-    build: docker-images/code
+    image: everlutionsk/code:latest
     volumes:
       - "../project:/var/www"
 
   fpm:
-    build: docker-images/fpm
+    image: everlutionsk/fpm:7.1.12
     working_dir: /var/www
     volumes_from:
       - code
@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   cli:
-    build: docker-images/cli
+    image: everlutionsk/cli:7.1.12
     working_dir: /var/www
     tty: true
     volumes_from:
@@ -38,23 +38,23 @@ services:
     build:
       context: docker-images/nginx
       args:
-        ENV: ${APP_ENV}
-        DOMAIN: ${APP_DOMAIN}
-        USER: ${BASE_AUTH_USER}
-        PASSWORD: ${BASE_AUTH_PASSWORD}
+        ENV: ${DOCKER_INFRASTRUCTURE_ENV}
+        DOMAIN: ${NGINX_DOMAIN}
+        USER: ${NGINX_BASE_AUTH_USER}
+        PASSWORD: ${NGINX_BASE_AUTH_PASSWORD}
     working_dir: /var/www
     volumes_from:
       - code
     ports:
-      - "${APP_PORT}:80"
+      - "$DOCKER_NGINX_PORT:80"
     volumes:
       - "./volumes/nginx/:/var/log/nginx"
     restart: unless-stopped
 
   es:
-    build: docker-images/es
+    image: everlutionsk/es:2.4.5
     ports:
-      - "${ES_PORT}:9200"
+      - "$DOCKER_ES_PORT:9200"
     volumes:
       - "./volumes/es/:/usr/share/elasticsearch/data"
       - "./volumes/es/logs/:/usr/share/elasticsearch/log"

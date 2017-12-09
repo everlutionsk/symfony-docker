@@ -1,4 +1,6 @@
-FROM php:7.1.9-fpm
+FROM php:7.1.12-fpm
+
+MAINTAINER Ivan Barlog <ivan.barlog@everlution.sk>
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libmcrypt-dev \
@@ -19,5 +21,7 @@ RUN dpkg-reconfigure -f noninteractive locales
 
 COPY app.ini /usr/local/etc/php/conf.d/app.ini
 COPY app.pool.conf /usr/local/etc/php/pool.d/app.pool.conf
+
+RUN usermod -u 1000 www-data
 
 CMD ["php-fpm"]

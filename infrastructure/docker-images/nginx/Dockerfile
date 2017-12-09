@@ -1,9 +1,11 @@
-FROM nginx:1.13.5
+FROM nginx:1.13.7
 
-ARG ENV=dev
-ARG DOMAIN=dev.symfony
-ARG USER=user
-ARG PASSWORD=password
+MAINTAINER Ivan Barlog <ivan.barlog@everlution.sk>
+
+ARG ENV
+ARG DOMAIN
+ARG USER
+ARG PASSWORD
 
 ENV DOMAIN $DOMAIN
 ENV USER $USER
@@ -29,5 +31,3 @@ RUN sed -i "s/{password}/$PASSWORD/g" /etc/nginx/.htpasswd
 
 # Run nginx in foreground.
 CMD ["nginx", "-g", "daemon off;"]
-
-

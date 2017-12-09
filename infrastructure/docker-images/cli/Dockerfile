@@ -1,4 +1,6 @@
-FROM php:7.1.9-cli
+FROM php:7.1.12-cli
+
+MAINTAINER Ivan Barlog <ivan.barlog@everlution.sk>
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libmcrypt-dev \
@@ -8,7 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     zlib1g-dev \
     libpcre3-dev \
-    locales
+    locales \
+    vim
 
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
 RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
@@ -20,5 +23,7 @@ RUN dpkg-reconfigure -f noninteractive locales
 
 # Add composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN usermod -u 1000 www-data
 
 CMD ["php", "-a"]

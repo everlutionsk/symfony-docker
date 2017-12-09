@@ -1,12 +1,15 @@
 version: '2'
 services:
   db:
-    build: docker-images/mysql
+    image: everlutionsk/mysql:5.7.20
     ports:
-      - "0.0.0.0:${DB_PORT}:3306"
+      - "0.0.0.0:$DOCKER_DB_PORT:3306"
     tty: true
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DOCKER_DB_ROOT_PASSWORD}
     volumes:
       - "./volumes/mysql/:/var/lib/mysql"
       - "./volumes/sqldump/:/sqldump"
@@ -14,7 +17,7 @@ services:
     restart: unless-stopped
 
   fpm:
-    build: docker-images/fpm-dev
+    image: everlutionsk/fpm-dev:7.1.12
 
   test:
     image: everlutionsk/php-test
@@ -28,4 +31,4 @@ services:
   adminer:
     image: adminer
     ports:
-      - "8080:8080"
+      - "$DOCKER_ADMINER_PORT:8080"

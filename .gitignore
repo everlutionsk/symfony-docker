@@ -1,5 +1,4 @@
 .idea/
-*/.composer
 */volumes/
 project/phpunit/
 */env/docker.env

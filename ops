@@ -9,31 +9,30 @@ if [ ! -f ./infrastructure/env/symfony.env ]; then
     exit 1
 fi
 
-if [ -f "./infrastructure/env/docker.env" ]; then
-    source ./infrastructure/env/docker.env
+if [ ! -f ./infrastructure/env/docker.env ]; then
+    cp ./infrastructure/env/docker.env.dist ./infrastructure/env/docker.env
+    echo -e "\e[01;31mThe ./infrastructure/env/docker.env file has been created. Please change it according to README.md before continuing.\e[0m"
+    exit 1
 fi
 
-# Set environment variables for compose
-export APP_ENV=${SYMFONY_APP_ENV:-dev}
-export APP_PORT=${SYMFONY_APP_PORT:-80}
-export ES_PORT=${SYMFONY_ES_PORT:-9200}
-export APP_DOMAIN=${SYMFONY_APP_DOMAIN:-dev.symfony}
-export BASE_AUTH_USER=${SYMFONY_BASE_AUTH_USER:-user}
-export BASE_AUTH_PASSWORD=${SYMFONY_BASE_AUTH_PASSWORD:-password}
+# source env files
+source ./infrastructure/env/docker.env
+set -a
+source ./infrastructure/env/symfony.env
+set +a
 
-echo -e "\e[96m ENV=$APP_ENV; DOMAIN=$APP_DOMAIN \e[0m"
+echo -e "\e[96m ENV=$DOCKER_INFRASTRUCTURE_ENV; DOMAIN=$NGINX_DOMAIN \e[0m"
 
-if [ "$APP_ENV" == "prod" ]; then
+if [ "$DOCKER_INFRASTRUCTURE_ENV" == "prod" ]; then
     COMPOSE="docker-compose -p ${PWD##*/} -f infrastructure/docker-compose.yml"
 else
     COMPOSE="docker-compose -p ${PWD##*/} -f infrastructure/docker-compose.yml -f infrastructure/docker-compose-dev.yml"
-    export DB_PORT=${SYMFONY_DB_PORT:-3306}
 fi
 
 print_help () {
 echo "Usage: $0 [command] [argument, ...]
 
-init {domain} - initializes the project from scratch
+init - initializes the project from scratch
 up - brings containers up
 stop - stops containers
 down - stops and removes containers
@@ -42,10 +41,11 @@ bin/console - runs Symfony's bin/console within cli container
 composer - runs composer within cli container
 npm - runs npm within node container
 encore - runs encore within cli container (you need to install encore and set-up your project for proper use with Symfony's webpack first)
-check-code - checks your src/ and tests/ with php-cs-fixer and phpmd utilities
+cs - checks your src/ and tests/ with php-cs-fixer and phpmd utilities
 test - run tests with phpunit
 permissions - fixes permissions in var/ folder
-mysql - runs mysql within db container
+mysql - connects to the database within db container
+mysqldump - dumps the database to ./infrastructure/volumes/sqldump
 compose - wrapper for docker-compose"
 exit 1
 }
@@ -56,8 +56,7 @@ fi
 
 case "$1" in
     init)
-        shift 1
-        sudo ./infrastructure/bin/init "$@"
+        sudo ./infrastructure/bin/init $NGINX_DOMAIN
         ;;
     up)
         $COMPOSE stop && $COMPOSE build && $COMPOSE up -d
@@ -75,7 +74,6 @@ case "$1" in
     bin/console)
         shift 1
         $COMPOSE exec cli bin/console "$@"
-        sudo ./infrastructure/bin/fix-permissions
         ;;
     composer)
         shift 1
@@ -89,23 +87,26 @@ case "$1" in
         shift 1
         $COMPOSE exec node ./node_modules/.bin/encore "$@"
         ;;
-    check-code)
-        # php-cs-fixer on src/ and tests/
-        $COMPOSE exec test php-cs-fixer fix src/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
-        $COMPOSE exec test php-cs-fixer fix tests/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
-        # phpmd on src/ and tests/
-        $COMPOSE exec test phpmd src/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php && \
-        $COMPOSE exec test phpmd tests/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php
+    cs)
+        $COMPOSE exec test bash -c "php-cs-fixer fix src/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
+                                    php-cs-fixer fix tests/ --allow-risky yes --diff --verbose --using-cache=no --rules=@Symfony,declare_strict_types,-simplified_null_return,-phpdoc_align && \
+                                    phpmd src/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php && \
+                                    phpmd tests/ text cleancode, codesize, controversial, design, naming, unusedcode --suffixes php"
         ;;
     test)
         $COMPOSE exec test phpunit --log-junit phpunit/junit.xml
         ;;
     permissions)
-        sudo ./infrastructure/bin/fix-permissions
+        ./infrastructure/bin/fix-permissions
         ;;
     mysql)
         shift 1
-        $COMPOSE exec db mysql "$@"
+        $COMPOSE exec db mysql -u$DB_USER -p$DB_USER $DB_NAME
+        ;;
+    mysqldump)
+        FILENAME=/sqldump/$(date +%d-%m-%Y_%H-%M)_$NGINX_DOMAIN.sql
+        $COMPOSE exec db mysqldump -u$DB_USER -p$DB_USER $DB_NAME > $FILENAME
+        echo "You can find your dump at ./infrastructure/volumes$FILENAME"
         ;;
     compose)
         shift 1

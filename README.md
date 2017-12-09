@@ -29,10 +29,8 @@ Following script will:
 - fix file permissions
 
 ```bash
-./ops init {domain name}
+./ops init
 ```
-
-You need to specify `{domain name}` for instance `dev.project`. For further information please read the `init` file
 
 ### parameters.yml.dist
 
@@ -68,26 +66,21 @@ You can remove any other code from `app_dev.php` and `app.php` which is related 
 The project provides `docker-compose` wrapper which can be invoked by `./ops`. Here are commands which can be used:
 
 ```bash
-./ops init {domain} # initializes the project from scratch
-./ops up # brings containers up
-./ops stop # stops containers
-./ops down # stops and removes containers
-./ops bin/console # runs Symfony's bin/console within cli container
-./ops composer # runs composer within cli container
-./ops npm # runs npm within node container
-./ops encore # runs encore within cli container (you need to install encore and set-up your project for proper use with Symfony's webpack first)
-./ops check-code # checks your src/ and tests/ with php-cs-fixer and phpmd utilities
-./ops test # run tests with phpunit
-./ops permissions # fixes permissions in var/ folder
-./ops mysql # runs mysql within db container
-
-./ops # wrapper for docker-compose - see docker-compose documentation
-```
-
-If you are having problems with permissions after running Symfony commands, please do run following command as root from your local machine (not docker container):
-
-```bash
-./ops permission
+init - initializes the project from scratch
+up - brings containers up
+stop - stops containers
+down - stops and removes containers
+restart - stops, rebuilds and starts specified containers eg. '$0 restart nginx fpm' will restart nginx and fpm
+bin/console - runs Symfony's bin/console within cli container
+composer - runs composer within cli container
+npm - runs npm within node container
+encore - runs encore within cli container (you need to install encore and set-up your project for proper use with Symfony's webpack first)
+cs - checks your src/ and tests/ with php-cs-fixer and phpmd utilities
+test - run tests with phpunit
+permissions - fixes permissions in var/ folder
+mysql - connects to the database within db container
+mysqldump - dumps the database to ./infrastructure/volumes/sqldump
+compose - wrapper for docker-compose
 ```
 
 ### Add autocompletion for `ops`
