@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
 
   fpm:
-    image: everlutionsk/fpm-dev:7.1.12
+    build: docker-images/fpm-dev
 
   test:
     image: everlutionsk/php-test
