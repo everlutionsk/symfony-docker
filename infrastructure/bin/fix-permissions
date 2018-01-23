@@ -1,29 +1,6 @@
 #!/usr/bin/env bash
 
 OWNER=$USER
-R=`id -Gn $USER | grep '\bwww-data\b'`
+sudo chown -R 33:33 project/var/*
+sudo chown -R $OWNER:$OWNER project/vendor 
 
-if [[ -z $R ]]; then
-    sudo usermod -a -G www-data $OWNER
-fi
-
-sudo chown -R www-data:www-data project/var
-sudo chmod -R 0775 project/var
-
-mkdir -p project/vendor
-sudo chown -R www-data:www-data project/vendor
-sudo chmod -R 0775 project/vendor
-
-mkdir -p project/bin
-sudo chown -R www-data:www-data project/bin
-sudo chmod -R 0775 project/bin
-
-sudo chown -R www-data:www-data project/web
-sudo chmod -R 0775 project/web
-
-mkdir -p project/.composer
-sudo chown -R www-data:www-data project/.composer
-sudo chmod -R 0775 project/.composer
-
-sudo chown -R www-data:www-data project/composer.lock
-sudo chmod -R 0775 project/composer.lock
