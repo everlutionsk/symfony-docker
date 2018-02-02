@@ -2,6 +2,8 @@ FROM php:7.1.12-cli
 
 MAINTAINER Ivan Barlog <ivan.barlog@everlution.sk>
 
+COPY app.ini /usr/local/etc/php/conf.d/app.ini
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libmcrypt-dev \
     libicu-dev \
