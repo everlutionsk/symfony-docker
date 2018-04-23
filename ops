@@ -16,8 +16,8 @@ if [ ! -f ./infrastructure/env/docker.env ]; then
 fi
 
 # source env files
-source ./infrastructure/env/docker.env
 set -a
+source ./infrastructure/env/docker.env
 source ./infrastructure/env/symfony.env
 set +a
 
