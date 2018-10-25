@@ -11,6 +11,10 @@ ENV DOMAIN $DOMAIN
 ENV USER $USER
 ENV PASSWORD $PASSWORD
 
+# Install nginx-extras
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx-extras
+
 # Remove default nginx site configuration.
 RUN rm -rf /etc/nginx/conf.d/default.conf
 
